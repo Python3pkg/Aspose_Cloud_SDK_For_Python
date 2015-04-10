@@ -983,7 +983,7 @@ class MailMerge:
 
         validate_output = Utils.validate_result(response)
         if not validate_output:
-            return Utils.download_file(self.filename, self.filename, remote_folder, storage_type, storage_name)
+            return Utils.download_file(response['Document']['FileName'], self.filename, remote_folder, storage_type, storage_name)
         else:
             return validate_output
 
@@ -1019,7 +1019,7 @@ class MailMerge:
 
         validate_output = Utils.validate_result(response)
         if not validate_output:
-            return Utils.download_file(self.filename, self.filename, remote_folder, storage_type, storage_name)
+            return Utils.download_file(response['Document']['FileName'], self.filename, remote_folder, storage_type, storage_name)
         else:
             return validate_output
 

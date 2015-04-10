@@ -8,6 +8,7 @@ from asposecloud.words import Converter
 from asposecloud.words import Document
 from asposecloud.storage import Folder
 from asposecloud.words import Extractor
+from asposecloud.words import MailMerge
 
 class TestAsposeWords(unittest.TestCase):
 
@@ -19,6 +20,30 @@ class TestAsposeWords(unittest.TestCase):
         asposecloud.AsposeApp.app_sid = str(data['app_sid'])
         asposecloud.AsposeApp.output_path = str(data['output_location'])
         asposecloud.Product.product_uri = str(data['product_uri'])
+
+    def test_mailmerge_execute(self):
+        fld = Folder()
+        response = fld.upload_file('./data/SimpleMerge/SimpleMerge.docx')
+        self.assertEqual(response, True)
+
+        f = open('./data/SimpleMerge/SimpleMerge.xml')
+        xml = f.read()
+
+        mailmerge = MailMerge('SimpleMerge.docx')
+        response = mailmerge.execute(xml)
+        self.assertEqual(True, os.path.exists('./output/SimpleMerge.docx'))
+
+    def test_mailmerge_execute_template(self):
+        fld = Folder()
+        response = fld.upload_file('./data/ExecuteTemplate/ExecuteTemplate.doc')
+        self.assertEqual(response, True)
+
+        f = open('./data/ExecuteTemplate/ExecuteTemplate.xml')
+        xml = f.read()
+
+        mailmerge = MailMerge('ExecuteTemplate.doc')
+        response = mailmerge.execute_template(xml)
+        self.assertEqual(True, os.path.exists('./output/ExecuteTemplate.doc'))
 
     def test_get_paragraph_run_font(self):
         fld = Folder()
