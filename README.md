@@ -1,3 +1,4 @@
+[![PyPI version](https://badge.fury.io/py/asposecloud.svg)](http://badge.fury.io/py/asposecloud)
 #Aspose Cloud SDK for Python Repository
 
 This repository contains Aspose Cloud SDK for Python source code. This SDK allows you to work with Aspose REST API in your Python applications quickly and easily. 
