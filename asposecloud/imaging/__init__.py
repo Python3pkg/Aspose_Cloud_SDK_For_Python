@@ -20,6 +20,114 @@ class Document:
 
         self.base_uri = Product.product_uri + 'imaging/' + self.filename
 
+    def update_tiff_properties_local(self, input_file_path, bit_depth, compression, resolution_unit, new_width, new_height,
+                               horizontal_resolution, vertical_resolution, output_path,
+                               remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param input_file_path:
+        :param bit_depth:
+        :param compression:
+        :param resolution_unit:
+        :param new_width:
+        :param new_height:
+        :param horizontal_resolution:
+        :param vertical_resolution:
+        :param output_path:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = Product.product_uri + 'imaging/tiff'
+        qry = {'compression': compression, 'resolutionUnit': resolution_unit, 'newWidth' : new_width,
+               'newHeight' : new_height, 'horizontalResolution' : horizontal_resolution,
+               'verticalResolution' : vertical_resolution, 'bitDepth' : bit_depth, 'outputPath': output_path}
+
+        str_uri = Utils.build_uri(str_uri, qry)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            with open(input_file_path, 'rb') as payload:
+                response = requests.post(signed_uri, data=payload, headers={
+                    'content-type': 'application/json', 'accept': 'application/json'
+                }, stream=True)
+                response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_updated.tiff'
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
+
+    def update_tiff_properties(self, bit_depth, compression, resolution_unit, new_width, new_height,
+                               horizontal_resolution, vertical_resolution, output_path,
+                               remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param bit_depth:
+        :param compression:
+        :param resolution_unit:
+        :param new_width:
+        :param new_height:
+        :param horizontal_resolution:
+        :param vertical_resolution:
+        :param output_path:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = Product.product_uri + 'storage/file/' + self.filename
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+        signed_uri = Utils.sign(str_uri)
+        file_content = requests.get(signed_uri, headers={
+            'content-type': 'application/json', 'accept': 'application/json'
+        }, stream=True)
+
+
+        str_uri = Product.product_uri + 'imaging/tiff'
+        qry = {'compression': compression, 'resolutionUnit': resolution_unit, 'newWidth' : new_width,
+               'newHeight' : new_height, 'horizontalResolution' : horizontal_resolution,
+               'verticalResolution' : vertical_resolution, 'bitDepth' : bit_depth, 'outputPath': output_path}
+
+        str_uri = Utils.build_uri(str_uri, qry)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            response = requests.post(signed_uri, file_content, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_updated.tiff'
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
+
     def update_psd_properties_local(self, input_file_path, channels_count, compression_method,
                               remote_folder='', storage_type='Aspose', storage_name=None):
 
@@ -382,7 +490,100 @@ class Document:
         response = None
         try:
             response = requests.get(signed_uri, headers={
-                'content-type': 'application/json', 'accept': 'application/json', 'x-aspose-client' : 'PYTHONSDK/v1.0'
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def get_tiff_frame_properties(self, frame_id, remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param frame_id:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/frames/' + str(frame_id) + '/properties'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def extract_frame(self, frame_id, remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param frame_id:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/frames/' + str(frame_id) + '?saveOtherFrames=false'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_frame_' + str(frame_id) + '.tiff'
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
+
+        return response
+
+    def append_tiff(self, append_file, remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = Product.product_uri + 'imaging/tiff/' + self.filename + '/appendTiff'
+
+        qry = {'appendFile': append_file}
+        str_uri = Utils.build_uri(str_uri, qry)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
             })
             response.raise_for_status()
             response = response.json()
@@ -450,7 +651,225 @@ class Image:
         else:
             return validate_output
 
+    def crop_image(self, x, y, width, height, output_path, save_format,
+                           remote_folder='', storage_type='Aspose', storage_name=None):
 
+        """
+
+        :param x:
+        :param y:
+        :param width:
+        :param height:
+        :param output_path:
+        :param save_format:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = Product.product_uri + 'imaging/' + self.filename + '/crop'
+        qry = {'x': x, 'y': y, 'width': width, 'height': height, 'outputPath': output_path, 'format': save_format}
+
+        str_uri = Utils.build_uri(str_uri, qry)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            save_format = 'zip' if save_format == 'html' else save_format
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_croped.' + save_format
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
+
+    def update_tiff_frame(self, frame_id, params,
+                           remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param frame_id:
+        :param params:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = Product.product_uri + 'imaging/' + self.filename + '/frames/' + str(frame_id)
+        str_uri = Utils.build_uri(str_uri, params)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            save_format = 'tiff'
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_updated_frame_' + \
+                          str(frame_id) + '.' + save_format
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
+
+    def rotate_tiff_frame(self, frame_id, rotate_method, output_path,
+                           remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param frame_id:
+        :param rotate_method:
+        :param new_height:
+        :param output_path:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = Product.product_uri + 'imaging/' + self.filename + '/frames/' + str(frame_id)
+        qry = {'saveOtherFrames': True, 'rotateFlipMethod': rotate_method, 'outputPath': output_path}
+
+        str_uri = Utils.build_uri(str_uri, qry)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            save_format = 'tiff'
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_rotated_frame_' + \
+                          str(frame_id) + '.' + save_format
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
+
+    def resize_tiff_frame(self, frame_id, new_width, new_height, output_path,
+                           remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param frame_id:
+        :param new_width:
+        :param new_height:
+        :param output_path:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = Product.product_uri + 'imaging/' + self.filename + '/frames/' + str(frame_id)
+        qry = {'saveOtherFrames': True, 'newWidth': new_width, 'newHeight': new_height, 'outputPath': output_path}
+
+        str_uri = Utils.build_uri(str_uri, qry)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            save_format = 'tiff'
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_resized_frame_' + \
+                          str(frame_id) + '.' + save_format
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
+
+    def crop_tiff_frame(self, frame_id, x, y, new_width, new_height, output_path,
+                           remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param frame_id:
+        :param x:
+        :param y:
+        :param new_width:
+        :param new_height:
+        :param output_path:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = Product.product_uri + 'imaging/' + self.filename + '/frames/' + str(frame_id)
+        qry = {'saveOtherFrames': True, 'x':x, 'y':y, 'newWidth': new_width, 'newHeight': new_height,
+               'outputPath': output_path}
+
+        str_uri = Utils.build_uri(str_uri, qry)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            save_format = 'tiff'
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_croped_frame_' + \
+                          str(frame_id) + '.' + save_format
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
 
     def resize_image(self, input_file_path, new_width, new_height, output_filename, save_format,
                            remote_folder='', storage_type='Aspose', storage_name=None):
@@ -498,6 +917,44 @@ class Image:
         else:
             return validate_output
 
+    def update_image(self, params, save_format, remote_folder='', storage_type='Aspose', storage_name=None):
+
+        """
+
+        :param params:
+        :param save_format:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = self.base_uri + '/updateImage'
+        params['format'] = save_format
+        str_uri = Utils.build_uri(str_uri, params)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            save_format = 'zip' if save_format == 'html' else save_format
+            output_path = AsposeApp.output_path + Utils.get_filename(self.filename) + '_updated.' + save_format
+            Utils.save_file(response, output_path)
+            return output_path
+        else:
+            return validate_output
 
 
 # ========================================================================
