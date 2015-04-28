@@ -1,6 +1,7 @@
 __author__ = 'assadmahmood'
 
 import requests
+import json
 
 from asposecloud import Product
 from asposecloud import AsposeApp
@@ -316,6 +317,35 @@ class Calendar:
 
         return response['Calendar']
 
+    def add_calendar(self, calendar_data, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param calendar_data:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/calendars'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        json_data = json.dumps(calendar_data)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, json_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
     def delete_calendar(self, calendar_id, remote_folder='', storage_type='Aspose', storage_name=None):
         """
 
@@ -516,6 +546,35 @@ class Document:
             exit(1)
 
         return response['TaskLinks']
+
+    def add_link(self, link_data, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param link_data:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/taskLinks'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        json_data = json.dumps(link_data)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, json_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
 
     def delete_link(self, link_index, remote_folder='', storage_type='Aspose', storage_name=None):
         """

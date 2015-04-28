@@ -20,7 +20,7 @@ class Document:
         if not filename:
             raise ValueError("filename not specified")
 
-        self.base_uri = Product.product_uri + 'words/' + self.filename
+        self.base_uri = Product.product_uri + 'email/' + self.filename
 
     def get_property(self, property_name, remote_folder='', storage_type='Aspose', storage_name=None):
         """
@@ -113,6 +113,33 @@ class Document:
             return output_path
         else:
             return validate_output
+
+    def add_attachment(self, attachment_name, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param attachment_name:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/attachments/' + attachment_name
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
 
 # ========================================================================
 # CONVERTER CLASS
