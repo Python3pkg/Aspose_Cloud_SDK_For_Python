@@ -16,7 +16,7 @@ class Builder:
         self.base_uri = Product.product_uri + 'barcode'
 
     def generate(self, code_text, symbology='QR', image_format='png', x_res=None, y_res=None, x_dim=None,
-                 y_dim=None, remote_folder='', storage_type='Aspose', storage_name=None):
+                 y_dim=None, extra_params=None, remote_folder='', storage_type='Aspose', storage_name=None):
         """
         Generate Barcode
 
@@ -27,6 +27,7 @@ class Builder:
         :param y_res:
         :param x_dim:
         :param y_dim:
+        :param extra_params:
         :param remote_folder: storage path to operate
         :param storage_type: type of storage e.g Aspose, S3
         :param storage_name: name of storage e.g. MyAmazonS3
@@ -41,21 +42,26 @@ class Builder:
         if image_format == '':
             raise ValueError("image_format can not be empty.")
 
-        str_uri = self.base_uri + '/generate?text=' + code_text + '&type=' + symbology + '&format=' + image_format
+        str_uri = self.base_uri + '/generate'
+        qry_str = {'text': code_text, 'type': symbology, 'format': image_format}
         if x_res:
-            str_uri += '&resolutionX=' + x_res
+            qry_str['resolutionX'] = x_res
         if y_res:
-            str_uri += '&resolutionY=' + y_res
+            qry_str['resolutionY'] = y_res
         if x_dim:
-            str_uri += '&dimensionX=' + x_dim
+            qry_str['dimensionX'] = x_dim
         if y_dim:
-            str_uri += '&dimensionY=' + y_dim
+            qry_str['dimensionsY'] = y_dim
 
+        if extra_params:
+            qry_str.update(extra_params)
+
+        str_uri = Utils.build_uri(str_uri, qry_str)
         str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
 
         signed_uri = Utils.sign(str_uri)
         response = requests.get(signed_uri, headers={
-            'content-type': 'application/json', 'accept': 'application/json', 'x-aspose-client' : 'PYTHONSDK/v1.0'
+            'content-type': 'application/json', 'accept': 'application/json'
         }, stream=True)
 
         return response
@@ -89,6 +95,30 @@ class Reader:
         if symbology:
             str_uri += '?type=' + symbology
 
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = requests.get(signed_uri, headers={
+            'content-type': 'application/json', 'accept': 'application/json'
+        }).json()
+        return response['Barcodes'] if response['Code'] == 200 else False
+
+    def read_by_algorithm(self, symbology=None, algorithm=None, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+        Read a Barcode
+
+        :param symbology:
+        :param algorithm:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/' + self.filename + '/recognize'
+        if symbology:
+            str_uri += '?type=' + symbology
+        if algorithm:
+            str_uri = Utils.build_uri(str_uri, {'BinarizationHints': algorithm})
         str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
 
         signed_uri = Utils.sign(str_uri)

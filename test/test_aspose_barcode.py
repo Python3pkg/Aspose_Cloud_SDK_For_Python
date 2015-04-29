@@ -23,6 +23,17 @@ class TestAsposeBarcode(unittest.TestCase):
         response = builder.generate('Text to generate barcode', 'QR', 'png')
         self.assertEqual(response.status_code, 200)
 
+    def test_save_barcode(self):
+        builder = Builder()
+        params = {'rotAngle':45}
+        response = builder.generate('Text to generate barcode', 'QR', 'jpg',None,None,None,None,params)
+        self.assertEqual(response.status_code, 200)
+
+    def test_read_by_algorithm(self):
+        reader = Reader('barcodeQR.png')
+        response = reader.read_by_algorithm('QR','MedianSmoothing')
+        self.assertEqual(list, type(response))
+
     def test_read_barcode_local(self):
         reader = Reader('barcodeQR.png')
         response = reader.read_from_local_image('./data/barcodeQR.png', 'QR')
