@@ -22,6 +22,232 @@ class Document:
 
         self.base_uri = Product.product_uri + 'slides/' + self.filename
 
+    def create_empty_presentation(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.put(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response
+
+    def merge_presentations(self, presentation_list, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param presentation_list:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/merge'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        json_data = json.dumps(presentation_list)
+        response = None
+        try:
+            response = requests.put(signed_uri, json_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response['Document'] if response['Code'] == 200 else False
+
+    def split_presentation(self, from_slide, to_slide, destination=None, save_format=None, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param from_slide:
+        :param to_slide:
+        :param destination:
+        :param save_format:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/split'
+        qry_str = {'from': from_slide, 'to': to_slide}
+        if(destination):
+            qry_str['destFolder'] = destination
+        if(save_format):
+            qry_str['format'] = save_format
+        str_uri = Utils.build_uri(str_uri,qry_str)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response
+
+    def add_slide(self, position, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param position:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/slides?position=' + str(position)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response
+
+    def clone_slide(self, slide_no, position, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param slide_no:
+        :param position:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/slides?position=' + str(position) + '&SlideToClone=' + str(slide_no)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response
+
+    def change_slide_position(self, old_position, new_position, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param old_position:
+        :param new_position:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/slides?OldPosition=' + str(old_position) + '&NewPosition=' + str(new_position)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response
+
+    def delete_all_slides(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/slides'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response
+
+    def get_background(self, slide_no, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param slide_no:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/slides/' + str(slide_no) +'/background'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response
+
     def get_properties(self, remote_folder='', storage_type='Aspose', storage_name=None):
         """
 
@@ -324,7 +550,43 @@ class Document:
         response = None
         try:
             response = requests.post(signed_uri, json_data, headers={
-                'content-type': 'application/json', 'accept': 'application/json', 'x-aspose-client' : 'PYTHONSDK/v1.0'
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            return True
+        else:
+            return validate_output
+
+    def replace_all_text(self, old_text, new_text,
+                     remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param slide_number:
+        :param old_text:
+        :param new_text:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/replaceText'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        json_data = json.dumps({'OldValue': old_text, 'NewValue': new_text})
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, json_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
             })
             response.raise_for_status()
             response = response.json()
@@ -366,6 +628,33 @@ class Document:
 
         return response['TextItems']['Items'] if response['TextItems']['Items'] else False
 
+    def get_all_text_items(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param slide_number:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/textItems'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response['TextItems']['Items'] if response['TextItems']['Items'] else False
+
 # ========================================================================
 # EXTRACTOR CLASS
 # ========================================================================
@@ -380,6 +669,60 @@ class Extractor:
             raise ValueError("filename not specified")
 
         self.base_uri = Product.product_uri + 'slides/' + self.filename
+
+    def get_comments(self, slide_no, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param slide_no:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/slides/' + str(slide_no) +'/comments'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response
+
+    def get_aspect_ratio(self, slide_no, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param slide_no:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = self.base_uri + '/slides/' + str(slide_no)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        return response['Slide']['Width'] / response['Slide']['Height'] if response['Code'] == 200 else False
 
     def get_image_count(self, remote_folder='', storage_type='Aspose', storage_name=None):
         """
@@ -671,12 +1014,13 @@ class Converter:
 
         self.base_uri = Product.product_uri + 'slides/' + self.filename
 
-    def convert(self, slide_number, save_format, stream_out=False, output_filename=None,
+    def convert(self, save_format, additional_params=None, slide_number=None, stream_out=False, output_filename=None,
                 remote_folder='', storage_type='Aspose', storage_name=None):
         """
 
-        :param slide_number:
         :param save_format:
+        :param additional_params:
+        :param slide_number:
         :param stream_out:
         :param output_filename:
         :param remote_folder: storage path to operate
@@ -687,10 +1031,13 @@ class Converter:
         if not save_format:
             raise ValueError("save_format not specified")
 
-        if not slide_number:
-            raise ValueError("slide_number not specified")
-
-        str_uri = self.base_uri + '/slides/' + str(slide_number) + '?format=' + save_format
+        str_uri = self.base_uri + '/slides'
+        if(slide_number):
+            str_uri += '/' + str(slide_number)
+        qry_str = {'format': save_format}
+        if(additional_params):
+            qry_str.update(additional_params)
+        str_uri = Utils.build_uri(str_uri, qry_str)
         str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
 
         signed_uri = Utils.sign(str_uri)
@@ -711,8 +1058,11 @@ class Converter:
                 if output_filename is None:
                     output_filename = self.filename
                 save_format = 'zip' if save_format == 'html' else save_format
-                output_path = AsposeApp.output_path + Utils.get_filename(output_filename) + '_' + str(slide_number) + '.' + \
+                if(slide_number):
+                    output_path = AsposeApp.output_path + Utils.get_filename(output_filename) + '_' + str(slide_number) + '.' + \
                     save_format
+                else:
+                    output_path = AsposeApp.output_path + Utils.get_filename(output_filename)  + '.' + save_format
                 Utils.save_file(response, output_path)
                 return output_path
             else:
