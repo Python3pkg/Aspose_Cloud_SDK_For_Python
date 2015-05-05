@@ -21,6 +21,13 @@ class TestAsposePdf(unittest.TestCase):
         asposecloud.AsposeApp.output_path = str(data['output_location'])
         asposecloud.Product.product_uri = str(data['product_uri'])
 
+    def test_create_empty_pdf(self):
+        doc = Document('empty_pdf.pdf')
+        response = doc.create_empty_pdf(False,'empty_pdf.pdf')
+
+        self.assertEqual(True, os.path.exists('./output/empty_pdf.pdf'))
+
+
     def test_create_pdf(self):
         folder = Folder()
         response = folder.upload_file('./data/create_pdf_test.svg')
@@ -38,6 +45,78 @@ class TestAsposePdf(unittest.TestCase):
         documenta.create_pdf('create_pdf_test.jpg','jpeg')
         self.assertEqual(True, os.path.exists('./output/create_pdf_jpeg.pdf'))
 
+    def test_form_fields_count(self):
+        folder = Folder()
+        response = folder.upload_file('./data/test_file_on_storage.pdf')
+        self.assertEqual(True, response)
+
+        doc = Document('test_file_on_storage.pdf')
+        response = doc.get_form_fields_count()
+        self.assertEqual(int, type(response))
+
+    def test_convert_by_url(self):
+        response = Converter.convert_by_url('http://www.analysis.im/uploads/seminar/pdf-sample.pdf','pdf',False)
+        self.assertEqual(True, os.path.exists('./output/pdf-sample.pdf'))
+
+    def test_split_pdf(self):
+        folder = Folder()
+        response = folder.upload_file('./data/test_file_on_storage.pdf')
+        self.assertEqual(True, response)
+
+        doc = Document('test_file_on_storage.pdf')
+        response = doc.split_pdf()
+        self.assertEqual(dict, type(response))
+
+    def test_add_new_page(self):
+        folder = Folder()
+        response = folder.upload_file('./data/test_file_on_storage.pdf')
+        self.assertEqual(True, response)
+
+        doc = Document('test_file_on_storage.pdf')
+        page_count = doc.get_page_count()
+
+        response = doc.add_new_page(False,'test_file_on_storage_new_page.pdf')
+        self.assertEqual(True,os.path.exists(response))
+        page_count_after_new = doc.get_page_count()
+        self.assertGreater(page_count_after_new,page_count)
+
+    def test_delete_page(self):
+        folder = Folder()
+        response = folder.upload_file('./data/test_file_on_storage.pdf')
+        self.assertEqual(True, response)
+
+        doc = Document('test_file_on_storage.pdf')
+        page_count = doc.get_page_count()
+
+        response = doc.add_new_page(False,'test_file_on_storage_new_page.pdf')
+        self.assertEqual(True,os.path.exists(response))
+        page_count_after_new = doc.get_page_count()
+        self.assertGreater(page_count_after_new,page_count)
+
+        response = doc.delete_page(1,False,'delete_page_test.pdf')
+        self.assertEqual(True,os.path.exists(response))
+        page_count_after_del = doc.get_page_count()
+        self.assertEqual(page_count,page_count_after_del)
+
+    def test_move_page(self):
+        folder = Folder()
+        response = folder.upload_file('./data/test_file_on_storage.pdf')
+        self.assertEqual(True, response)
+
+        doc = Document('test_file_on_storage.pdf')
+        page_count = doc.get_page_count()
+
+        response = doc.add_new_page(False,'test_file_on_storage_new_page.pdf')
+        self.assertEqual(True,os.path.exists(response))
+        response = doc.add_new_page(False,'test_file_on_storage_new_page.pdf')
+        self.assertEqual(True,os.path.exists(response))
+        response = doc.add_new_page(False,'test_file_on_storage_new_page.pdf')
+        self.assertEqual(True,os.path.exists(response))
+        page_count_after_new = doc.get_page_count()
+        self.assertGreater(page_count_after_new,page_count)
+
+        response = doc.move_page(1,2)
+        self.assertEqual(True,os.path.exists(response))
 
     def test_convert_local_file(self):
         # Create object of pdf converter class
