@@ -175,5 +175,19 @@ class TestAsposeWords(unittest.TestCase):
         converter.convert_local_file('./data/test_convertlocal.docx', 'doc')
         self.assertEqual(True, os.path.exists('./output/test_convertlocal.doc'))
 
+    def test_convert_webpage(self):
+        json_data = { "LoadingDocumentUrl": "http://google.com",
+                      "SaveOptions": {
+                          "Password": None,
+                          "SaveRoutingSlip": True,
+                          "SaveFormat": "doc",
+                          "FileName": "google.doc",
+                          "DmlRenderingMode": None,
+                          "DmlEffectsRenderingMode": None
+                      }
+}
+        response = Converter.convert_webpage(json_data)
+        self.assertEqual(dict, type(response))
+
 if __name__ == '__main__':
     unittest.main()

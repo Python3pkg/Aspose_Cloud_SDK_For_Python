@@ -56,7 +56,7 @@ class Document:
         else:
             return validate_output
 
-    def split_document(self, from_page, to_page, save_format='pdf',
+    def split_document(self, from_page=None, to_page=None, save_format='pdf',
                        remote_folder='', storage_type='Aspose', storage_name=None):
         """
 
@@ -70,7 +70,13 @@ class Document:
         """
 
         str_uri = self.base_uri + '/split'
-        qry = {'from': from_page, 'to': to_page, 'format': save_format}
+        qry = {'format': save_format}
+        if from_page:
+            qry['from'] = from_page
+
+        if to_page:
+            qry['to'] = to_page
+
         str_uri = Utils.build_uri(str_uri, qry)
         str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
         signed_uri = Utils.sign(str_uri)
@@ -543,6 +549,175 @@ class Document:
 
         return True if response['Code'] == 200 else False
 
+    def accept_tracking_changes(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/revisions/acceptAll'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json', 'x-aspose-client' : 'PYTHONSDK/v1.0'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def reject_tracking_changes(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/revisions/rejectAll'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json', 'x-aspose-client' : 'PYTHONSDK/v1.0'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def get_document_protection(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = self.base_uri + '/protection'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+        signed_uri = Utils.sign(str_uri)
+
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def protect_document(self, options, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param options:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = self.base_uri + '/protection'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+        signed_uri = Utils.sign(str_uri)
+
+        post_data = json.dumps(options)
+
+        response = None
+        try:
+            response = requests.put(signed_uri, post_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def unprotect_document(self, options, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param options:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = self.base_uri + '/protection'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+        signed_uri = Utils.sign(str_uri)
+
+        post_data = json.dumps(options)
+
+        response = None
+        try:
+            response = requests.delete(signed_uri, data=post_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def update_document_protection(self, options, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param options:
+        :param remote_folder:
+        :param storage_type:
+        :param storage_name:
+        :return:
+        """
+
+        str_uri = self.base_uri + '/protection'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+        signed_uri = Utils.sign(str_uri)
+
+        post_data = json.dumps(options)
+
+        response = None
+        try:
+            response = requests.post(signed_uri, post_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
 # ========================================================================
 # EXTRACTOR CLASS
 # ========================================================================
@@ -557,6 +732,32 @@ class Extractor:
             raise ValueError("filename not specified")
 
         self.base_uri = Product.product_uri + 'words/' + self.filename
+
+    def get_stats(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/statistics'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response['StatData'] if response['Code'] == 200 else False
 
     def get_sections(self, remote_folder='', storage_type='Aspose', storage_name=None):
         """
@@ -709,7 +910,38 @@ class Extractor:
         response = None
         try:
             response = requests.get(signed_uri, headers={
-                'content-type': 'application/json', 'accept': 'application/json', 'x-aspose-client' : 'PYTHONSDK/v1.0'
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response['Font']
+
+    def update_paragraph_run_font(self, para_id, run_index, font_data, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param para_id
+        :param run_index
+        :param font_data
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/paragraphs/' + str(para_id) + '/runs/' + str(run_index) + '/font'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        post_data = json.dumps(font_data)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, post_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
             })
             response.raise_for_status()
             response = response.json()
@@ -1023,6 +1255,32 @@ class MailMerge:
         else:
             return validate_output
 
+    def get_field_names(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/mailMergeFieldNames'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response['FieldNames']['Names'] if response['Code'] == 200 else False
+
 # ========================================================================
 # BUILDER CLASS
 # ========================================================================
@@ -1091,7 +1349,37 @@ class Builder:
         response = None
         try:
             response = requests.post(signed_uri, json_data, headers={
-                'content-type': 'application/json', 'accept': 'application/json', 'x-aspose-client' : 'PYTHONSDK/v1.0'
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            return Utils.download_file(self.filename, self.filename, remote_folder, storage_type, storage_name)
+        else:
+            return validate_output
+
+    def remove_watermark(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/watermark'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.delete(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
             })
             response.raise_for_status()
             response = response.json()
@@ -1225,8 +1513,9 @@ class Converter:
         signed_uri = Utils.sign(str_uri)
         response = None
         try:
-            response = Utils.upload_file_binary(input_file, signed_uri)
-            response.raise_for_status()
+            with open(input_file, 'rb') as payload:
+                response = Utils.upload_file_binary(input_file, signed_uri)
+                response.raise_for_status()
         except requests.HTTPError as e:
             print e
             print response.content
@@ -1245,3 +1534,37 @@ class Converter:
                 return response.content
         else:
             return validate_output
+
+    @staticmethod
+    def convert_webpage(json_data, stream_out=False, output_filename=None,
+                remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param json_data:
+        :param stream_out:
+        :param output_filename:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        str_uri = Product.product_uri + 'words/loadWebDocument'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        post_data =json.dumps(json_data)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, post_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
