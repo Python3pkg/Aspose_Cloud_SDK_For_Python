@@ -129,5 +129,37 @@ class TestAsposeCells(unittest.TestCase):
         response = ws.get_min_data_column(0,0);
         self.assertEqual(int, type(response))
 
+    def test_save_as(self):
+        folder = Folder()
+        response = folder.upload_file('./data/split_workbook.xlsx')
+        self.assertEqual(True, response)
+
+        wb = Workbook('split_workbook.xlsx')
+        options = '<PdfSaveOptions>' \
+                  '<desiredPPI>300</desiredPPI>' \
+                  '<jpegQuality>70</jpegQuality>' \
+                  '<OnePagePerSheet>true</OnePagePerSheet>' \
+                  '<SaveFormat>Pdf</SaveFormat>' \
+                  '</PdfSaveOptions>'
+
+        response = wb.save_as(options,'save_wb.pdf')
+        self.assertEqual(True, os.path.exists(response))
+
+    def test_merge(self):
+        folder = Folder()
+        response = folder.upload_file('./data/split_workbook.xlsx')
+        self.assertEqual(True, response)
+
+        folder = Folder()
+        response = folder.upload_file('./data/test_convert_cell.xlsx')
+        self.assertEqual(True, response)
+
+        wb = Workbook('split_workbook.xlsx')
+        response = wb.merge('test_convert_cell.xlsx')
+        self.assertEqual(dict, type(response))
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

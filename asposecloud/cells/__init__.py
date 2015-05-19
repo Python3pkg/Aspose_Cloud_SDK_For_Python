@@ -920,6 +920,33 @@ class Worksheet:
 
         return response['Columns']['ColumnsList']
 
+    def get_column(self, col_index, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param col_index:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/cells/columns/' + col_index
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.get(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response['Column']
+
     def add_ole_object(self, ole_file, image_file, upper_left_row, upper_left_col, height, width,
                        remote_folder='', storage_type='Aspose', storage_name=None):
         """
@@ -1174,6 +1201,343 @@ class Worksheet:
             exit(1)
 
         return response['Value']
+
+    def hide_worksheet(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/visible?isVisible=false'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.put(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def unhide_worksheet(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/visible?isVisible=true'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.put(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def move_worksheet(self, dest_worksheet_name, position, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param dest_worksheet_name:
+        :param position:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        if not dest_worksheet_name:
+            raise ValueError("dest_worksheet_name not provided.")
+
+        if not position:
+            raise ValueError("position not provided.")
+
+        options = {}
+        options['DestinationWorsheet'] = dest_worksheet_name
+        options['Position'] = position
+
+        post_data = json.dumps(options)
+
+        str_uri = self.base_uri + '/position'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, post_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def sort_data(self, sort_order, sort_area, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param sort_order:
+        :param sort_area:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        if not sort_order:
+            raise ValueError("sort_order not provided.")
+
+        if not sort_area:
+            raise ValueError("sort_area not provided.")
+
+
+        post_data = json.dumps(sort_order)
+
+        str_uri = self.base_uri + '/sort?cellArea=' + sort_area
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, post_data, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def copy_worksheet(self, new_worksheet_name, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param new_worksheet_name:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        if not new_worksheet_name:
+            raise ValueError("new_worksheet_name not provided.")
+
+        str_uri = Product.product_uri + 'cells/' + self.filename + '/workbook/worksheets/' + new_worksheet_name \
+                  + '/copy?sourcesheet=' + self.worksheet_name
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def rename_worksheet(self, new_worksheet_name, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param new_worksheet_name:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        if not new_worksheet_name:
+            raise ValueError("new_worksheet_name not provided.")
+
+        str_uri = Product.product_uri + 'cells/' + self.filename + '/workbook/worksheets/' + self.worksheet_name  + '/Rename?newname=' + new_worksheet_name
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def update_properties(self, properties, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param properties:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+
+        if not properties:
+            raise ValueError("properties not provided.")
+
+        str_uri = Product.product_uri + 'cells/' + self.filename + '/workbook/worksheets/' + self.worksheet_name
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, properties, headers={
+                'content-type': 'application/xml', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def set_background_image(self, image_filename, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param image_filename:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/Background?imageFile=' + image_filename
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.put(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def delete_background_image(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/Background'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.delete(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def freeze_panes(self, row, col, freezed_rows, freezed_cols,
+                     remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param row:
+        :param col:
+        :param freezed_rows:
+        :param freezed_cols:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/FreezePanes'
+        qry = {'row': row,'column': col, 'freezedRows': freezed_rows, 'freezedColumns': freezed_cols}
+        str_uri = Utils.build_uri(str_uri, qry)
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.put(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
+    def unfreeze_panes(self, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/FreezePanes'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.delete(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
 
 # ========================================================================
 # WORKBOOK CLASS
@@ -1764,6 +2128,78 @@ class Workbook:
 
         return True if response['Code'] == 200 else False
 
+    def save_as(self, options, output_filename, stream_out=False,
+                remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param options:
+        :param stream_out:
+        :param output_filename:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        if not options:
+            raise ValueError("options not specified")
+
+        if not output_filename:
+            raise ValueError("output_filename not specified")
+
+        str_uri = self.base_uri + '/saveAs?newfilename=' + output_filename
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, options, headers={
+                'content-type': 'application/xml', 'accept': 'application/json'
+            }, stream=True)
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            if not stream_out:
+                if output_filename is None:
+                    output_filename = self.filename
+                output_path = AsposeApp.output_path + output_filename
+                Utils.save_file(response, output_path)
+                return output_path
+            else:
+                return response.content
+        else:
+            return validate_output
+
+    def merge(self, merge_with, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param merge_with:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/merge?mergeWith=' + merge_with
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.post(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        return response
+
 # ========================================================================
 # TEXT EDITOR CLASS
 # ========================================================================
@@ -1934,7 +2370,102 @@ class ChartEditor:
         response = None
         try:
             response = requests.delete(signed_uri, headers={
-                'content-type': 'application/json', 'accept': 'application/json', 'x-aspose-client' : 'PYTHONSDK/v1.0'
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            return Utils.download_file(self.filename, self.filename, remote_folder, storage_type, storage_name)
+        else:
+            return validate_output
+
+    def delete_charts(self, worksheet_name, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param worksheet_name:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/worksheets/' + worksheet_name + '/charts'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.delete(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            return Utils.download_file(self.filename, self.filename, remote_folder, storage_type, storage_name)
+        else:
+            return validate_output
+
+    def show_chart_legend(self, worksheet_name, chart_index, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param worksheet_name:
+        :param chart_index:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/worksheets/' + worksheet_name + '/charts/' + str(chart_index) + '/legend'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.put(signed_uri, None, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
+            })
+            response.raise_for_status()
+            response = response.json()
+        except requests.HTTPError as e:
+            print e
+            print response.content
+            exit(1)
+
+        validate_output = Utils.validate_result(response)
+        if not validate_output:
+            return Utils.download_file(self.filename, self.filename, remote_folder, storage_type, storage_name)
+        else:
+            return validate_output
+
+    def hide_chart_legend(self, worksheet_name, chart_index, remote_folder='', storage_type='Aspose', storage_name=None):
+        """
+
+        :param worksheet_name:
+        :param chart_index:
+        :param remote_folder: storage path to operate
+        :param storage_type: type of storage e.g Aspose, S3
+        :param storage_name: name of storage e.g. MyAmazonS3
+        :return:
+        """
+        str_uri = self.base_uri + '/worksheets/' + worksheet_name + '/charts/' + str(chart_index) + '/legend'
+        str_uri = Utils.append_storage(str_uri, remote_folder, storage_type, storage_name)
+
+        signed_uri = Utils.sign(str_uri)
+        response = None
+        try:
+            response = requests.delete(signed_uri, headers={
+                'content-type': 'application/json', 'accept': 'application/json'
             })
             response.raise_for_status()
             response = response.json()
