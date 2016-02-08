@@ -1,3 +1,20 @@
+## IMPORTANT NOTICE
+This SDK is no longer updated because we have created a newer and much improved version of this SDK available at following product wise repositories
+* [Aspose.Storage Cloud SDK for Python](https://goo.gl/6nFx9Z)
+* [Aspose.Words Cloud SDK for Python](https://goo.gl/atajmS)
+* [Aspose.Cells Cloud SDK for Python](https://goo.gl/uyCBN8)
+* [Aspose.Slides Cloud SDK for Python](https://goo.gl/SBZBjM)
+* [Aspose.Pdf Cloud SDK for Python](https://goo.gl/AIG4aL)
+* [Aspose.BarCode Cloud SDK for Python](https://goo.gl/EyF9ll)
+* [Aspose.Tasks Cloud SDK for Python](https://goo.gl/u94fcg)
+* [Aspose.Email Cloud SDK for Python](https://goo.gl/KdeIu3)
+* [Aspose.Imaging Cloud SDK for Python](https://goo.gl/KzXTRA)
+* [Aspose.OCR Cloud SDK for Python](https://goo.gl/1a66a3)
+
+You are kindly requested to try our new SDKs and then plan to migrate. We will be more than happy to help and assist you if you face any issues during or after migration. We will however continue to provide support to our existing customers for some time.
+
+---
+
 [![PyPI version](https://badge.fury.io/py/asposecloud.svg)](http://badge.fury.io/py/asposecloud)
 #Aspose Cloud SDK for Python Repository
 
