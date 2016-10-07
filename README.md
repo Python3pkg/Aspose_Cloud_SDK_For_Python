@@ -1,15 +1,15 @@
 ## IMPORTANT NOTICE
 This SDK is no longer updated because we have created a newer and much improved version of this SDK available at following product wise repositories
-* [Aspose.Storage Cloud SDK for Python](https://goo.gl/6nFx9Z)
-* [Aspose.Words Cloud SDK for Python](https://goo.gl/atajmS)
-* [Aspose.Cells Cloud SDK for Python](https://goo.gl/uyCBN8)
-* [Aspose.Slides Cloud SDK for Python](https://goo.gl/SBZBjM)
-* [Aspose.Pdf Cloud SDK for Python](https://goo.gl/AIG4aL)
-* [Aspose.BarCode Cloud SDK for Python](https://goo.gl/EyF9ll)
-* [Aspose.Tasks Cloud SDK for Python](https://goo.gl/u94fcg)
-* [Aspose.Email Cloud SDK for Python](https://goo.gl/KdeIu3)
-* [Aspose.Imaging Cloud SDK for Python](https://goo.gl/KzXTRA)
-* [Aspose.OCR Cloud SDK for Python](https://goo.gl/1a66a3)
+* [Aspose.Storage Cloud SDK for Python](https://github.com/aspose-total/Aspose.Total-for-Cloud/tree/master/SDKs/Aspose.Storage-Cloud-SDK-for-Python)
+* [Aspose.Words Cloud SDK for Python](https://github.com/aspose-words/Aspose.Words-for-Cloud/tree/master/SDKs/Aspose.Words-Cloud-SDK-for-Python)
+* [Aspose.Cells Cloud SDK for Python](https://github.com/aspose-cells/Aspose.Cells-for-Cloud/tree/master/SDKs/Aspose.Cells-Cloud-SDK-for-Python)
+* [Aspose.Slides Cloud SDK for Python](https://github.com/aspose-slides/Aspose.Slides-for-Cloud/tree/master/SDKs/Aspose.Slides-Cloud-SDK-for-Python)
+* [Aspose.Pdf Cloud SDK for Python](https://github.com/aspose-pdf/Aspose.Pdf-for-Cloud/tree/master/SDKs/Aspose.Pdf-Cloud-SDK-for-Python)
+* [Aspose.BarCode Cloud SDK for Python](https://github.com/aspose-barcode/Aspose.BarCode-for-Cloud/tree/master/SDKs/Aspose.BarCode-Cloud-SDK-for-Python)
+* [Aspose.Tasks Cloud SDK for Python](https://github.com/aspose-tasks/Aspose.Tasks-for-Cloud/tree/master/SDKs/Aspose.Tasks-Cloud-SDK-for-Python)
+* [Aspose.Email Cloud SDK for Python](https://github.com/aspose-email/Aspose.Email-for-Cloud/tree/master/SDKs/Aspose.Email-Cloud-SDK-for-Python)
+* [Aspose.Imaging Cloud SDK for Python](https://github.com/aspose-imaging/Aspose.Imaging-for-Cloud/tree/master/SDKs/Aspose.Imaging-Cloud-SDK-for-Python)
+* [Aspose.OCR Cloud SDK for Python](https://github.com/aspose-ocr/Aspose.OCR-for-Cloud/tree/master/SDKs/Aspose.OCR-Cloud-SDK-for-Python)
 
 You are kindly requested to try our new SDKs and then plan to migrate. We will be more than happy to help and assist you if you face any issues during or after migration. We will however continue to provide support to our existing customers for some time.
 
