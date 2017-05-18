@@ -7,7 +7,7 @@ import string
 import os
 import json
 
-from urllib.parse import urlparse
+from urlparse import urlparse
 from asposecloud import AsposeApp
 from asposecloud import Product
 
@@ -31,7 +31,7 @@ class Utils:
         :return: returns a uri with query string e.g http://api.aspose.com/v1/testurl?param1=value1&param2=value2
         """
         qry_str = ''
-        for key, value in qry_data.items():
+        for key, value in qry_data.iteritems():
             qry_str += str(key) + '=' + str(value) + '&'
 
         if qry_str:
@@ -187,8 +187,8 @@ class Utils:
             }, stream=True)
             response.raise_for_status()
         except requests.HTTPError as e:
-            print(e)
-            print(response.content)
+            print e
+            print response.content
             exit(1)
 
         Utils.save_file(response, AsposeApp.output_path + output_filename)
